@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>XYBLOX SHOP</title>
+<style>
+:root{
+  --bg:#0a0a0a;--bg-2:#111;--card:#161616;--card-2:#1a1a1a;
+  --border:#222;--border-2:#2a2a2a;
+  --text:#fff;--text-2:#8a8a8a;--text-3:#666;
+  --red:#e53935;--gold:#d4af37;--purple:#9c27b0;
+  --blue:#2196f3;--yellow:#f5a623;--diamond:#4fc3f7;
+  --green:#4caf50;--green-soft:#7bd88a;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{
+  height:100%;width:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:var(--text);
+  user-select:none;-webkit-user-select:none;overscroll-behavior:none;
+}
+body{
+  display:flex;flex-direction:column;
+  height:100vh;height:100dvh;overflow:hidden;
+  padding-top:var(--safe-top);padding-bottom:var(--safe-bot);
+}
+button,input{font-family:inherit;outline:none;border:none;background:none;color:inherit}
+img{display:block;max-width:100%}
+::-webkit-scrollbar{width:0;height:0}
+
+.topbar{
+  flex-shrink:0;display:flex;align-items:center;gap:10px;
+  padding:10px 14px;background:var(--bg);
+  border-bottom:1px solid var(--border);
+  position:relative;z-index:20;
+}
+.search-wrap{flex:1;position:relative}
+.search-input{
+  width:100%;height:44px;background:var(--card);
+  border:1px solid var(--border);border-radius:14px;
+  padding:0 14px 0 42px;color:var(--text);font-size:14px;
+}
+.search-input::placeholder{color:var(--text-3)}
+.search-input:focus{border-color:#333;background:var(--card-2)}
+.search-ico{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;color:var(--text-3);pointer-events:none;
+}
+.login-btn{
+  flex-shrink:0;display:flex;align-items:center;gap:8px;
+  height:44px;padding:0 16px;background:#fff;color:#000;
+  border-radius:14px;font-size:14px;font-weight:700;
+  cursor:pointer;transition:transform .15s;max-width:150px;
+}
+.login-btn:active{transform:scale(.96)}
+.login-btn span:last-child{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.login-btn .login-ico{
+  width:22px;height:22px;border-radius:50%;
+  background:#000;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:11px;font-weight:900;
+}
+.main{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;position:relative;
+}
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.tabbar{
+  flex-shrink:0;display:flex;align-items:center;justify-content:space-around;
+  height:64px;background:var(--bg);border-top:1px solid var(--border);
+  padding:0 6px;position:relative;z-index:20;
+}
+.tab{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  height:48px;cursor:pointer;border-radius:14px;
+  transition:background .2s;color:var(--text-3);
+}
+.tab.active{background:#fff;color:#000}
+.tab svg{width:24px;height:24px;stroke-width:2}
+.tab:active{transform:scale(.94)}
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue, get, update }
+    from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAh-t4Tmcf-JTGOYwi0sCafwT_0jylN7vk",
+    authDomain: "xyblox-shop.firebaseapp.com",
+    databaseURL: "https://xyblox-shop-default-rtdb.firebaseio.com",
+    projectId: "xyblox-shop",
+    storageBucket: "xyblox-shop.firebasestorage.app",
+    messagingSenderId: "421958234162",
+    appId: "1:421958234162:web:fa5eaeea13416f0b278c2b"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    window.FirebaseDB = { db, ref, set, onValue, get, update, ready: true };
+    console.log('✅ Firebase готов');
+  } catch(e){
+    console.error('❌ Firebase ошибка:', e);
+    window.FirebaseDB = { ready: false };
+  }
+</script>
+<style>
+.page-head{padding:22px 18px 10px}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.3px}
+.page-sub{margin-top:6px;font-size:13px;color:var(--text-2);line-height:1.4}
+.chips{display:flex;gap:8px;padding:14px 18px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:10px 18px;background:var(--card);
+  border:1px solid var(--border);border-radius:999px;
+  font-size:13px;font-weight:600;color:var(--text-2);
+  cursor:pointer;transition:all .2s;white-space:nowrap}
+.chip:active{transform:scale(.96)}
+.chip.active{background:#fff;color:#000;border-color:#fff}
+
+.banner-wrap{padding:14px 18px 0}
+.banner{position:relative;border-radius:20px;overflow:hidden;
+  aspect-ratio:16/9;background:linear-gradient(160deg,#0e2a1a,#06160c);
+  display:flex;flex-direction:column;justify-content:flex-end;padding:18px}
+.banner::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.75) 100%)}
+.banner-emoji{position:absolute;top:18%;left:50%;transform:translateX(-50%);
+  font-size:76px;opacity:.28}
+.banner-tag{position:relative;z-index:2;align-self:flex-start;
+  padding:6px 12px;background:#fff;color:#000;
+  border-radius:10px;font-size:11px;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.banner-title{position:relative;z-index:2;font-size:26px;font-weight:800;margin-bottom:4px}
+.banner-desc{position:relative;z-index:2;font-size:13px;color:rgba(255,255,255,.85)}
+.banner-dots{display:flex;justify-content:center;gap:6px;padding:12px 0 6px}
+.banner-dots .dot{width:6px;height:6px;border-radius:50%;background:#333;
+  transition:all .3s;cursor:pointer}
+.banner-dots .dot.active{width:20px;border-radius:3px;background:#fff}
+
+.quick-links{padding:14px 18px 20px}
+.quick-item{display:flex;align-items:center;gap:14px;padding:16px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;cursor:pointer;margin-bottom:10px;
+  transition:background .15s, transform .15s}
+.quick-item:active{transform:scale(.98);background:var(--card-2)}
+.quick-item .qi-ico{width:44px;height:44px;border-radius:12px;
+  background:var(--card-2);display:flex;align-items:center;
+  justify-content:center;font-size:22px;flex-shrink:0}
+.quick-item .qi-info{flex:1;min-width:0}
+.quick-item .qi-title{font-size:14px;font-weight:700}
+.quick-item .qi-arrow{color:var(--text-3);font-size:18px}
+
+.placeholder{padding:60px 24px;text-align:center}
+.placeholder .ph-ico{font-size:72px;opacity:.25;margin-bottom:16px}
+.placeholder .ph-text{font-size:14px;color:var(--text-3);letter-spacing:1px}
+
+.footer{padding:28px 18px 24px;border-top:1px solid var(--border);margin-top:24px}
+.footer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.footer-logo{display:flex;align-items:center;gap:12px}
+.footer-logo-img{width:52px;height:52px;border-radius:12px;
+  object-fit:cover;background:#111;flex-shrink:0}
+.footer-brand .fb-top{font-size:18px;font-weight:900;letter-spacing:1px}
+.footer-brand .fb-top::before{content:"//";color:var(--text-2);
+  font-weight:900;margin-right:2px}
+.footer-socials{display:flex;gap:8px}
+.social-btn{width:44px;height:44px;background:var(--card);
+  border:1px solid var(--border);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-2);cursor:pointer}
+.social-btn:active{background:var(--card-2)}
+.social-btn svg{width:20px;height:20px;fill:currentColor}
+.footer-copyright{font-size:12px;color:var(--text-3);margin-bottom:14px}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:12px;color:var(--text-3);
+  text-decoration:none;cursor:pointer}
+
+.modal-back{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.85);
+  backdrop-filter:blur(10px);display:flex;align-items:center;
+  justify-content:center;padding:20px;opacity:0;pointer-events:none;
+  transition:opacity .25s}
+.modal-back.show{opacity:1;pointer-events:auto}
+.modal{background:var(--card);border:1px solid var(--border-2);
+  border-radius:22px;width:100%;max-width:400px;padding:24px 22px;
+  transform:scale(.9);transition:transform .28s cubic-bezier(.34,1.3,.64,1)}
+.modal-back.show .modal{transform:scale(1)}
+.modal-field{width:100%;height:48px;background:var(--bg-2);
+  border:1px solid var(--border);border-radius:12px;
+  padding:0 14px;color:var(--text);font-size:14px;margin-bottom:10px}
+.modal-field:focus{border-color:#333}
+
+.toast{position:fixed;bottom:calc(90px + var(--safe-bot));left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--card-2);border:1px solid var(--border-2);
+  color:var(--text);padding:12px 20px;border-radius:14px;
+  font-size:13px;font-weight:600;z-index:200;opacity:0;
+  transition:opacity .25s, transform .25s;pointer-events:none;
+  max-width:85%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.zb-pack-grid{display:grid;grid-template-columns:repeat(2,1fr);
+  gap:10px;padding:0 18px 20px}
+.zb-pack{background:linear-gradient(145deg,#181818,#111);
+  border:1px solid #222;border-radius:16px;
+  padding:16px 12px;text-align:center;cursor:pointer;
+  transition:transform .15s,border-color .2s;position:relative}
+.zb-pack:active{transform:scale(.97)}
+.zb-pack.best{border-color:#4caf50}
+.zb-pack.best::before{content:"ЛУЧШАЯ ЦЕНА";position:absolute;
+  top:-8px;left:50%;transform:translateX(-50%);
+  background:#4caf50;color:#fff;font-size:9px;font-weight:900;
+  letter-spacing:.5px;padding:3px 10px;border-radius:40px;white-space:nowrap}
+.zb-pack .zb-ico{font-size:34px;margin-bottom:6px;line-height:1;
+  filter:drop-shadow(0 4px 12px rgba(76,175,80,.4))}
+.zb-pack .zb-amount{font-size:20px;font-weight:900;color:#4caf50;
+  line-height:1;letter-spacing:-.3px}
+.zb-pack .zb-amount small{font-size:11px;font-weight:700;color:#7bd88a;margin-left:2px}
+.zb-pack .zb-price{font-size:14px;font-weight:800;color:#fff;margin-top:8px}
+.zb-pack .zb-buy{margin-top:10px;width:100%;padding:9px;
+  background:linear-gradient(135deg,#4caf50,#2e7d32);
+  border:none;border-radius:10px;color:#fff;font-size:12px;
+  font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.5px}
+.zb-pack .zb-buy:active{transform:scale(.96)}
+.zb-balance{margin:0 18px 16px;padding:14px 18px;
+  background:linear-gradient(135deg,#0e2a1a,#06160c);
+  border:1px solid #2e7d32;border-radius:16px;
+  display:flex;align-items:center;justify-content:space-between}
+.zb-balance .zb-bal-label{font-size:11px;color:#7bd88a;
+  text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.zb-balance .zb-bal-value{font-size:22px;font-weight:900;
+  color:#4caf50;margin-top:3px;font-variant-numeric:tabular-nums}
+.zb-balance .zb-bal-ico{font-size:36px;line-height:1;
+  filter:drop-shadow(0 4px 12px rgba(76,175,80,.5))}
+</style>
+<style>
+.checkout-back{position:fixed;inset:0;z-index:110;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(10px);
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:0;opacity:0;pointer-events:none;transition:opacity .25s}
+.checkout-back.show{opacity:1;pointer-events:auto}
+.checkout{background:#111;border-top-left-radius:22px;
+  border-top-right-radius:22px;border:1px solid #222;border-bottom:none;
+  width:100%;max-width:500px;
+  padding:20px 20px calc(20px + var(--safe-bot));
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  max-height:92vh;overflow-y:auto}
+.checkout-back.show .checkout{transform:translateY(0)}
+.checkout-head{display:flex;align-items:center;
+  justify-content:space-between;margin-bottom:18px}
+.checkout-head h3{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.checkout-close{width:36px;height:36px;border-radius:50%;
+  background:#1a1a1a;color:#8a8a8a;border:1px solid #222;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;font-family:inherit}
+.checkout-close:active{background:#222}
+.checkout-product{background:#0a0a0a;border:1px solid #1e1e1e;
+  border-radius:16px;padding:14px;margin-bottom:20px;
+  display:flex;gap:14px;align-items:center}
+.checkout-product .cp-img{width:72px;height:72px;border-radius:14px;
+  flex-shrink:0;background:linear-gradient(135deg,#0e2a1a,#06160c);
+  border:1px solid #2e7d32;display:flex;align-items:center;
+  justify-content:center;font-size:34px}
+.checkout-product .cp-info{flex:1;min-width:0}
+.checkout-product .cp-title{font-size:16px;font-weight:800;
+  color:#fff;margin-bottom:4px}
+.checkout-product .cp-desc{font-size:12px;color:#8a8a8a;
+  line-height:1.4;margin-bottom:8px}
+.checkout-product .cp-price{font-size:18px;font-weight:900;color:#fff}
+.checkout-section-title{font-size:12px;font-weight:800;color:#8a8a8a;
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.checkout-method{background:#0a0a0a;border:1px solid #1e1e1e;
+  border-radius:14px;padding:14px 16px;display:flex;align-items:center;
+  gap:14px;margin-bottom:8px;cursor:pointer;
+  transition:border-color .2s,background .2s}
+.checkout-method:active{background:#141414}
+.checkout-method.selected{border-color:#4caf50;background:#0e1a10}
+.checkout-method .cm-ico{width:44px;height:44px;border-radius:12px;
+  background:#1a1a1a;border:1px solid #222;display:flex;
+  align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.checkout-method.selected .cm-ico{background:#0e2a1a;border-color:#2e7d32}
+.checkout-method .cm-info{flex:1;min-width:0}
+.checkout-method .cm-name{font-size:15px;font-weight:800;color:#fff}
+.checkout-method .cm-sub{font-size:11px;color:#8a8a8a;margin-top:2px}
+.checkout-method .cm-radio{width:22px;height:22px;border-radius:50%;
+  border:2px solid #444;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;transition:all .2s}
+.checkout-method.selected .cm-radio{border-color:#4caf50}
+.checkout-method.selected .cm-radio::after{content:"";width:10px;
+  height:10px;border-radius:50%;background:#4caf50}
+.checkout-actions{display:flex;gap:10px;margin-top:22px}
+.checkout-actions button{padding:16px;border-radius:14px;
+  font-size:15px;font-weight:800;cursor:pointer;
+  font-family:inherit;transition:transform .15s}
+.checkout-actions button:active{transform:scale(.97)}
+.checkout-cancel{flex:1;background:#1a1a1a;color:#8a8a8a;border:1px solid #222}
+.checkout-pay{flex:2;background:#fff;color:#000;border:none;
+  display:flex;align-items:center;justify-content:center;gap:8px}
+.checkout-pay svg{width:16px;height:16px}
+.checkout-pay:disabled{opacity:.6;cursor:wait}
+
+.pay-off-back{position:fixed;inset:0;z-index:120;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+.pay-off-back.show{opacity:1;pointer-events:auto}
+.pay-off{background:#111;border:1px solid #222;border-radius:22px;
+  width:100%;max-width:400px;padding:22px;transform:scale(.9);
+  transition:transform .28s cubic-bezier(.34,1.3,.64,1)}
+.pay-off-back.show .pay-off{transform:scale(1)}
+.pay-off-head{display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:16px;border-bottom:1px solid #1e1e1e;margin-bottom:24px}
+.pay-off-head h3{font-size:18px;font-weight:800}
+.pay-off-body{text-align:center;padding:10px 0 20px}
+.pay-off-icon{width:80px;height:80px;margin:0 auto 18px;border-radius:50%;
+  background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.4);
+  display:flex;align-items:center;justify-content:center;font-size:38px}
+.pay-off-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:12px}
+.pay-off-text{font-size:14px;color:#8a8a8a;line-height:1.6;
+  max-width:320px;margin:0 auto}
+.pay-off-close{width:100%;padding:16px;background:#1a1a1a;
+  color:#fff;border:1px solid #222;border-radius:14px;
+  font-size:15px;font-weight:700;cursor:pointer;
+  font-family:inherit;margin-top:10px}
+.pay-off-close:active{background:#222}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="search-wrap">
+    <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input class="search-input" id="searchInput" type="text" placeholder="Поиск пользователей">
+  </div>
+  <button class="login-btn" id="loginBtn" type="button">
+    <span class="login-ico">→</span>
+    <span>Войти</span>
+  </button>
+</header>
+
+<main class="main" id="mainContent">
+  <section class="screen active" id="screen-home">
+    <div class="banner-wrap">
+      <div class="banner">
+        <div class="banner-emoji">🟢</div>
+        <div class="banner-tag">Валюта</div>
+        <div class="banner-title">Zubucks</div>
+        <div class="banner-desc">Покупай зубуксы со скидкой!</div>
+      </div>
+      <div class="banner-dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+    <div class="quick-links">
+      <div class="quick-item" data-action="frames">
+        <div class="qi-ico">🎨</div>
+        <div class="qi-info"><div class="qi-title">Магазин рамок аватара</div></div>
+        <div class="qi-arrow">›</div>
+      </div>
+      <div class="quick-item" data-action="banners">
+        <div class="qi-ico">🖼️</div>
+        <div class="qi-info"><div class="qi-title">Магазин баннеров на комментарии</div></div>
+        <div class="qi-arrow">›</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-forum">
+    <div class="page-head" style="padding-bottom:6px">
+      <div class="page-title">💬 Чат игроков</div>
+      <div class="page-sub">Только для зарегистрированных. Вопросы — <b style="color:#4caf50">/help</b></div>
+    </div>
+    <div id="chat-locked" style="text-align:center;padding:60px 24px">
+      <div style="font-size:72px;opacity:.4;margin-bottom:14px">🔒</div>
+      <div style="font-size:15px;color:#8a8a8a;margin-bottom:16px">Чат доступен только игрокам с аккаунтом</div>
+      <button id="chat-login-btn" type="button" style="padding:14px 32px;background:#fff;color:#000;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer">Войти / Создать аккаунт</button>
+    </div>
+    <div id="chat-logged" style="display:none">
+      <div id="chat-messages" style="padding:14px 18px 200px;min-height:50vh;display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div id="chat-input-bar" style="display:none;position:fixed;bottom:64px;left:0;right:0;background:#0a0a0a;border-top:1px solid #222;padding:10px 14px;gap:8px;z-index:30;padding-bottom:calc(10px + var(--safe-bot))">
+      <input type="text" id="chat-input" placeholder="Написать сообщение или /help вопрос..." maxlength="300" style="flex:1;height:44px;background:#161616;border:1px solid #222;border-radius:14px;padding:0 14px;color:#fff;font-size:14px;outline:none">
+      <button id="chat-send" type="button" style="width:44px;height:44px;background:#fff;color:#000;border:none;border-radius:14px;font-size:20px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center">→</button>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-news">
+    <div class="page-head">
+      <div class="page-title">Новости</div>
+      <div class="page-sub">Обновления проекта и события</div>
+    </div>
+    <div style="padding:0 18px 24px">
+      <div style="background:#161616;border:1px solid #222;border-radius:16px;padding:16px;margin-bottom:12px;border-left:4px solid #4caf50">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4caf50,#2e7d32);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:16px">5</div>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#fff">5mmb9</div>
+            <div style="font-size:11px;color:#666;margin-top:2px">сегодня</div>
+          </div>
+        </div>
+        <div style="font-size:14px;color:#aaa;line-height:1.55">
+          <b style="color:#fff">Обновление чата</b><br><br>
+          ✅ Добавлен <b style="color:#fff">чат игроков</b> — теперь можно общаться напрямую.<br><br>
+          ✅ Новая команда <span style="display:inline-block;background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.4);padding:1px 8px;border-radius:6px;font-family:monospace;font-size:13px;color:#7bd88a">/help</span> — задать вопрос администрации.<br><br>
+          📌 Пример: <span style="color:#7bd88a;font-family:monospace">/help что такое XYBLOX SHOP?</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-shop">
+    <div class="page-head">
+      <div class="page-title">Магазин</div>
+      <div class="page-sub">Игровые товары и привилегии</div>
+    </div>
+    <div class="chips">
+      <div class="chip active">Все товары</div>
+      <div class="chip">Валюта</div>
+      <div class="chip">Транспорт</div>
+      <div class="chip">Вооружение</div>
+      <div class="chip">Фракции</div>
+    </div>
+    <div class="placeholder">
+      <div class="ph-ico">🏪</div>
+      <div class="ph-text">Товары появятся скоро</div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-posters">
+    <div class="page-head">
+      <div class="page-title">Постеры</div>
+      <div class="page-sub">Укрась свой профиль уникальными постерами</div>
+    </div>
+    <div class="chips">
+      <div class="chip active">Все</div>
+      <div class="chip">Обычные</div>
+      <div class="chip">Редкие</div>
+      <div class="chip">Эпические</div>
+      <div class="chip">Легендарные</div>
+      <div class="chip">Мифические</div>
+    </div>
+    <div class="placeholder">
+      <div class="ph-ico">👻</div>
+      <div class="ph-text">Постеры появятся скоро</div>
+    </div>
+  </section>
+  <section class="screen" id="screen-media">
+    <div class="page-head">
+      <div class="page-title">💚 Покупка Zubucks</div>
+      <div class="page-sub">Игровая валюта XYBLOX SHOP — зарабатывай и трать</div>
+    </div>
+    <div class="zb-balance">
+      <div>
+        <div class="zb-bal-label">Ваш баланс</div>
+        <div class="zb-bal-value"><span id="zbBalance">0</span> Zubucks</div>
+      </div>
+      <div class="zb-bal-ico">💚</div>
+    </div>
+    <div class="zb-pack-grid" id="zbPackGrid"></div>
+  </section>
+
+  <section class="screen" id="screen-frames">
+    <div class="page-head">
+      <div class="page-title">Рамки аватара</div>
+      <div class="page-sub">Купи рамку и выделись среди других игроков</div>
+    </div>
+    <div class="placeholder">
+      <div class="ph-ico">🖼️</div>
+      <div class="ph-text">Рамки появятся скоро</div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-terms">
+    <div class="page-head" style="padding-bottom:6px">
+      <button id="terms-back" type="button" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#161616;border:1px solid #222;border-radius:10px;color:#8a8a8a;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px">← Назад</button>
+      <div class="page-title">Пользовательское соглашение</div>
+      <div class="page-sub">Условия использования XYBLOX SHOP и валюты Zubucks</div>
+    </div>
+    <div style="padding:0 18px 24px;font-size:14px;line-height:1.7;color:#aaa">
+      <div style="background:#161616;border:1px solid #222;border-radius:16px;padding:18px;margin-bottom:12px;border-left:4px solid #4caf50">
+        <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:6px">Пользовательское соглашение</div>
+        <div style="color:#8a8a8a;font-size:13px;margin-bottom:8px">Условия использования сайта и сервисов XYBLOX SHOP</div>
+        <div style="color:#666;font-size:12px">📅 Последнее обновление: 8 октября 2026</div>
+      </div>
+
+      <div style="background:#161616;border:1px solid #222;border-radius:16px;padding:18px;margin-bottom:12px">
+        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">1. ПРИНЯТИЕ УСЛОВИЙ</div>
+        <div>Регистрируясь и используя XYBLOX SHOP, вы подтверждаете, что ознакомились с настоящим Соглашением и соглашаетесь соблюдать его условия. Если вы не согласны — не используйте Сервис.</div>
+      </div>
+
+      <div style="background:#161616;border:1px solid #222;border-radius:16px;padding:18px;margin-bottom:12px">
+        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">2. ВАЛЮТА ZUBUCKS</div>
+        <div style="margin-bottom:10px">Zubucks (ZB) — внутренняя игровая валюта XYBLOX SHOP. Используется для покупок на сайте.</div>
+        <div style="padding:12px;background:#0e2a1a;border:1px solid #2e7d32;border-radius:10px">
+          <b style="color:#4caf50">Важно:</b><br>
+          • Zubucks не являются реальными деньгами.<br>
+          • Обмен на рубли невозможен.<br>
+          • Баланс хранится в облаке и синхронизируется между устройствами.<br>
+          • Пополнение платное: цена в рублях.
+        </div>
+      </div>
+
+      <div style="background:#161616;border:1px solid #222;border-radius:16px;padding:18px;margin-bottom:12px">
+        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">3. ПОКУПКИ И ОПЛАТА</div>
+        <div>Покупки совершаются за Zubucks или через платёжную систему (СБП, карта). Все цены в рублях. Возврат Zubucks не производится после зачисления.</div>
+      </div>
+
+      <div style="background:#161616;border:1px solid #222;border-radius:16px;padding:18px;margin-bottom:12px">
+        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">4. МЕРЫ ОТВЕТСТВЕННОСТИ</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:400px">
+            <thead>
+              <tr style="background:#0e2a1a">
+                <th style="padding:10px;text-align:left;color:#4caf50;border-bottom:1px solid #2e7d32">НАРУШЕНИЕ</th>
+                <th style="padding:10px;text-align:left;color:#4caf50;border-bottom:1px solid #2e7d32">1 РАЗ</th>
+                <th style="padding:10px;text-align:left;color:#4caf50;border-bottom:1px solid #2e7d32">3+ РАЗ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #222"><td style="padding:10px;color:#fff">Оскорбления</td><td style="padding:10px;color:#8a8a8a">Предупреждение</td><td style="padding:10px;color:#e53935">Бан 3 дня</td></tr>
+              <tr style="border-bottom:1px solid #222"><td style="padding:10px;color:#fff">Спам / флуд</td><td style="padding:10px;color:#8a8a8a">Мут 1 час</td><td style="padding:10px;color:#e53935">Мут 3 часа</td></tr>
+              <tr style="border-bottom:1px solid #222"><td style="padding:10px;color:#fff">Читерство Zubucks</td><td style="padding:10px;color:#8a8a8a">Бан 7 дней</td><td style="padding:10px;color:#e53935">Пермабан</td></tr>
+              <tr><td style="padding:10px;color:#fff">Мошенничество оплаты</td><td style="padding:10px;color:#8a8a8a">Бан 30 дней</td><td style="padding:10px;color:#e53935">Пермабан</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="background:#161616;border:1px solid #222;border-radius:16px;padding:18px">
+        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">5. ИЗМЕНЕНИЕ УСЛОВИЙ</div>
+        <div>Администрация может изменять условия в любое время. Продолжение использования = согласие с новой редакцией.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img class="footer-logo-img" alt="XYBLOX"
+          src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzFhMWEyMCIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjM4IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj5YWDwvdGV4dD48L3N2Zz4="/>
+        <div class="footer-brand"><div class="fb-top">XYBLOX SHOP</div></div>
+      </div>
+      <div class="footer-socials">
+        <button class="social-btn" data-social="discord" type="button" aria-label="Discord">
+          <svg viewBox="0 0 24 24"><path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.02-.06.05-.04.09c.32.61.68 1.19 1.07 1.74c.02.02.04.03.07.02c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.03zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12z"/></svg>
+        </button>
+        <button class="social-btn" data-social="telegram" type="button" aria-label="Telegram">
+          <svg viewBox="0 0 24 24"><path d="M11.94 2.06a10 10 0 1 0 0 20a10 10 0 0 0 0-20zm4.85 6.94l-1.63 7.72c-.12.55-.45.68-.91.42l-2.5-1.85l-1.2 1.16c-.13.13-.25.25-.5.25l.18-2.53l4.6-4.16c.2-.18-.04-.28-.3-.1l-5.7 3.6l-2.45-.77c-.53-.17-.54-.53.11-.78l9.55-3.68c.44-.16.82.1.68.72z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="footer-copyright">© 2026 XYBLOX SHOP. Все права защищены.</div>
+    <div class="footer-links">
+      <a data-link="privacy">Конфиденциальность</a>
+      <a data-link="terms">Соглашение</a>
+      <a data-link="status">Статус</a>
+    </div>
+  </footer>
+</main>
+<nav class="tabbar" id="tabbar">
+  <div class="tab active" data-tab="home" role="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>
+  </div>
+  <div class="tab" data-tab="forum" role="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H8l-4 3v-6.5A8 8 0 0 1 12 4a8 8 0 0 1 9 8z"/></svg>
+  </div>
+  <div class="tab" data-tab="news" role="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+  </div>
+  <div class="tab" data-tab="shop" role="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18l-1.5 11a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2L3 8z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>
+  </div>
+  <div class="tab" data-tab="posters" role="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7v3a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6V9a7 7 0 0 0-7-7z"/><circle cx="9.5" cy="10" r="1"/><circle cx="14.5" cy="10" r="1"/></svg>
+  </div>
+  <div class="tab" data-tab="media" role="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="m21 8-4 4 4 4V8z"/></svg>
+  </div>
+</nav>
+
+<div class="modal-back" id="loginModal">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:420px;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;gap:8px;background:#0a0a0a;border-radius:14px;padding:6px;margin-bottom:20px">
+      <button id="tabLogin" type="button" style="flex:1;padding:12px;background:#fff;color:#000;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">Вход</button>
+      <button id="tabRegister" type="button" style="flex:1;padding:12px;background:transparent;color:#8a8a8a;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">Регистрация</button>
+    </div>
+    <div id="loginForm">
+      <div style="font-size:12px;color:#8a8a8a;margin-bottom:6px">Email или логин <span style="color:#e53935">*</span></div>
+      <input class="modal-field" id="loginName" type="text" placeholder="Введите email или логин">
+      <div style="font-size:12px;color:#8a8a8a;margin-bottom:6px;margin-top:12px">Пароль <span style="color:#e53935">*</span></div>
+      <input class="modal-field" id="loginPass" type="password" placeholder="Введите пароль">
+      <button id="loginSubmit" type="button" style="width:100%;padding:16px;background:#fff;color:#000;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;margin-top:14px">Войти</button>
+      <div style="text-align:center;margin-top:18px;color:#8a8a8a;font-size:13px">
+        Нет аккаунта? <a href="#" onclick="event.preventDefault();switchAuthTab('register')" style="color:#fff;text-decoration:none;font-weight:700">Создать аккаунт</a>
+      </div>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div style="font-size:12px;color:#8a8a8a;margin-bottom:6px">Никнейм <span style="color:#e53935">*</span></div>
+      <input class="modal-field" id="regNick" type="text" placeholder="Придумайте никнейм" maxlength="20">
+      <div style="font-size:12px;color:#8a8a8a;margin-bottom:6px;margin-top:12px">Email <span style="color:#e53935">*</span></div>
+      <input class="modal-field" id="regEmail" type="email" placeholder="you@example.com">
+      <div style="font-size:12px;color:#8a8a8a;margin-bottom:6px;margin-top:12px">Пароль <span style="color:#e53935">*</span></div>
+      <input class="modal-field" id="regPass" type="password" placeholder="Минимум 8 символов">
+      <input class="modal-field" id="regPass2" type="password" placeholder="Повторите пароль">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;color:#e0e8f0;font-size:13px;margin:16px 0;padding:8px;border-radius:10px;user-select:none">
+        <input type="checkbox" id="regAgree" style="display:none">
+        <span id="regAgreeBox" style="width:22px;height:22px;border:2px solid #444;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:15px;color:transparent;flex-shrink:0;margin-top:1px;transition:all .15s">✓</span>
+        <span style="line-height:1.5">Я согласен с правилами проекта и обработкой персональных данных</span>
+      </label>
+      <button id="regSubmit" type="button" style="width:100%;padding:16px;background:#fff;color:#000;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer">Создать аккаунт</button>
+      <div style="text-align:center;margin-top:18px;color:#8a8a8a;font-size:13px">
+        Уже есть аккаунт? <a href="#" onclick="event.preventDefault();switchAuthTab('login')" style="color:#fff;text-decoration:none;font-weight:700">Войти</a>
+      </div>
+    </div>
+    <button id="modalCloseBtn" type="button" style="width:100%;padding:12px;background:transparent;color:#8a8a8a;border:1px solid #222;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;margin-top:14px">Закрыть</button>
+  </div>
+</div>
+
+<div class="checkout-back" id="checkoutModal">
+  <div class="checkout" onclick="event.stopPropagation()">
+    <div class="checkout-head">
+      <h3>Оформление покупки</h3>
+      <button class="checkout-close" id="checkoutClose" type="button">✕</button>
+    </div>
+    <div class="checkout-product">
+      <div class="cp-img" id="checkoutIco">💚</div>
+      <div class="cp-info">
+        <div class="cp-title" id="checkoutTitle">Zubucks</div>
+        <div class="cp-desc" id="checkoutDesc">Игровая валюта для покупок в XYBLOX SHOP</div>
+        <div class="cp-price" id="checkoutPrice">40 Zubucks — 5 ₽</div>
+      </div>
+    </div>
+    <div class="checkout-section-title">СПОСОБ ОПЛАТЫ</div>
+    <div class="checkout-method selected" data-method="sbp">
+      <div class="cm-ico">⚡</div>
+      <div class="cm-info"><div class="cm-name">СБП</div><div class="cm-sub">Система быстрых платежей</div></div>
+      <div class="cm-radio"></div>
+    </div>
+    <div class="checkout-method" data-method="card">
+      <div class="cm-ico">💳</div>
+      <div class="cm-info"><div class="cm-name">Банковская карта</div><div class="cm-sub">Visa, MasterCard, МИР</div></div>
+      <div class="cm-radio"></div>
+    </div>
+    <div class="checkout-actions">
+      <button class="checkout-cancel" id="checkoutCancel" type="button">Отмена</button>
+      <button class="checkout-pay" id="checkoutPay" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Перейти к оплате
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="pay-off-back" id="payOffModal">
+  <div class="pay-off" onclick="event.stopPropagation()">
+    <div class="pay-off-head">
+      <h3>Покупка завершена</h3>
+      <button class="checkout-close" id="payOffClose" type="button">✕</button>
+    </div>
+    <div class="pay-off-body">
+      <div class="pay-off-icon" style="background:rgba(76,175,80,.15);border-color:rgba(76,175,80,.4)">✅</div>
+      <div class="pay-off-title">Успешно куплено!</div>
+      <div class="pay-off-text" id="payOffText">Zubucks зачислены на ваш баланс.</div>
+    </div>
+    <button class="pay-off-close" id="payOffCloseBtn" type="button">Закрыть</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  'use strict';
+
+  /* ============ FIREBASE ============ */
+  function fbReady(){ return !!(window.FirebaseDB && window.FirebaseDB.ready); }
+  function fbSaveBalance(nick, balance){
+    if(!fbReady()) return Promise.resolve(false);
+    var db = window.FirebaseDB.db, ref = window.FirebaseDB.ref, set = window.FirebaseDB.set;
+    return set(ref(db, 'users/' + nick + '/zubucks'), balance)
+      .then(function(){ return true; })
+      .catch(function(e){ console.error(e); return false; });
+  }
+  function fbListenBalance(nick, cb){
+    if(!fbReady()){ cb(null); return; }
+    var db = window.FirebaseDB.db, ref = window.FirebaseDB.ref, onValue = window.FirebaseDB.onValue;
+    onValue(ref(db, 'users/' + nick + '/zubucks'), function(snap){
+      var val = snap.val();
+      cb(val === null ? 0 : val);
+    });
+  }
+  function fbSaveUser(nick, data){
+    if(!fbReady()) return Promise.resolve(false);
+    var db = window.FirebaseDB.db, ref = window.FirebaseDB.ref, update = window.FirebaseDB.update;
+    return update(ref(db, 'users/' + nick), data).catch(function(e){ console.error(e); });
+  }
+
+  /* ============ TOAST ============ */
+  var toastTimer = null;
+  function showToast(msg){
+    var el = document.getElementById('toast');
+    if(!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2200);
+  }
+  window.showToast = showToast;
+
+  /* ============ TABS ============ */
+  var TABS = ['home','forum','news','shop','posters','media','frames','terms'];
+  function switchTab(name){
+    if(TABS.indexOf(name) === -1) name = 'home';
+    document.querySelectorAll('.tab').forEach(function(t){
+      t.classList.toggle('active', t.getAttribute('data-tab') === name);
+    });
+    document.querySelectorAll('.screen').forEach(function(s){
+      s.classList.toggle('active', s.id === 'screen-' + name);
+    });
+    if(name === 'media') renderZubucks();
+    if(name === 'forum') updateChatAccess();
+    var main = document.getElementById('mainContent');
+    if(main) main.scrollTop = 0;
+  }
+  window.switchTab = switchTab;
+
+  function openTerms(){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    var t = document.getElementById('screen-terms');
+    if(t) t.classList.add('active');
+    var main = document.getElementById('mainContent');
+    if(main) main.scrollTop = 0;
+    document.querySelectorAll('.tab').forEach(function(tab){ tab.classList.remove('active'); });
+  }
+  window.openTerms = openTerms;
+
+  /* ============ USERS ============ */
+  function getUsers(){
+    try { return JSON.parse(localStorage.getItem('xyblox_users') || '{}'); } catch(e){ return {}; }
+  }
+  function saveUsers(u){
+    try { localStorage.setItem('xyblox_users', JSON.stringify(u)); } catch(e){}
+  }
+  function getCurrentUser(){
+    try { return localStorage.getItem('xyblox_current') || null; } catch(e){ return null; }
+  }
+  function setCurrentUser(n){
+    try {
+      if(n) localStorage.setItem('xyblox_current', n);
+      else localStorage.removeItem('xyblox_current');
+    } catch(e){}
+    updateTopbarUser();
+    updateChatAccess();
+    renderZubucks();
+    if(n) listenBalanceForUser(n);
+  }
+
+  function listenBalanceForUser(nick){
+    if(!fbReady()) return;
+    fbListenBalance(nick, function(balance){
+      if(balance === null) return;
+      var users = getUsers();
+      if(!users[nick]) users[nick] = {};
+      users[nick].zubucks = balance;
+      saveUsers(users);
+      var el = document.getElementById('zbBalance');
+      if(el) el.textContent = balance.toLocaleString('ru-RU');
+    });
+  }
+
+  function updateTopbarUser(){
+    var cur = getCurrentUser();
+    var btn = document.getElementById('loginBtn');
+    if(!btn) return;
+    if(cur){
+      btn.innerHTML = '<span class="login-ico" style="background:#4caf50">' + cur.charAt(0).toUpperCase() + '</span><span>' + cur + '</span>';
+      btn.onclick = function(){
+        if(confirm('Выйти из аккаунта ' + cur + '?')){
+          setCurrentUser(null);
+          showToast('Вы вышли');
+        }
+      };
+    } else {
+      btn.innerHTML = '<span class="login-ico">→</span><span>Войти</span>';
+      btn.onclick = openLogin;
+    }
+  }
+
+  /* ============ LOGIN MODAL ============ */
+  var loginModal = document.getElementById('loginModal');
+  function openLogin(){
+    if(!loginModal) return;
+    loginModal.classList.add('show');
+    switchAuthTab('login');
+  }
+  function closeLogin(){
+    if(loginModal) loginModal.classList.remove('show');
+  }
+  window.openLogin = openLogin;
+
+  function switchAuthTab(mode){
+    var tL = document.getElementById('tabLogin');
+    var tR = document.getElementById('tabRegister');
+    var fL = document.getElementById('loginForm');
+    var fR = document.getElementById('registerForm');
+    if(!tL || !tR) return;
+    if(mode === 'register'){
+      tL.style.background = 'transparent'; tL.style.color = '#8a8a8a';
+      tR.style.background = '#fff'; tR.style.color = '#000';
+      fL.style.display = 'none'; fR.style.display = 'block';
+    } else {
+      tR.style.background = 'transparent'; tR.style.color = '#8a8a8a';
+      tL.style.background = '#fff'; tL.style.color = '#000';
+      fR.style.display = 'none'; fL.style.display = 'block';
+    }
+  }
+  window.switchAuthTab = switchAuthTab;
+
+  function toggleRegAgree(){
+    var cb = document.getElementById('regAgree');
+    var box = document.getElementById('regAgreeBox');
+    if(!cb || !box) return;
+    cb.checked = !cb.checked;
+    box.style.background = cb.checked ? '#4caf50' : 'transparent';
+    box.style.borderColor = cb.checked ? '#4caf50' : '#444';
+    box.style.color = cb.checked ? '#fff' : 'transparent';
+  }
+
+  function submitLogin(){
+    var n = (document.getElementById('loginName')||{}).value || '';
+    var p = (document.getElementById('loginPass')||{}).value || '';
+    n = n.trim();
+    if(!n || !p){ showToast('Заполните поля'); return; }
+    var users = getUsers();
+    var key = Object.keys(users).find(function(k){
+      return k.toLowerCase() === n.toLowerCase() || (users[k].email||'').toLowerCase() === n.toLowerCase();
+    });
+    if(!key || users[key].pass !== p){ showToast('Неверный логин или пароль'); return; }
+    setCurrentUser(key);
+    closeLogin();
+    showToast('Добро пожаловать, ' + key + '!');
+  }
+
+  function submitRegister(){
+    var nick = ((document.getElementById('regNick')||{}).value||'').trim();
+    var email = ((document.getElementById('regEmail')||{}).value||'').trim();
+    var p1 = (document.getElementById('regPass')||{}).value||'';
+    var p2 = (document.getElementById('regPass2')||{}).value||'';
+    var ag = (document.getElementById('regAgree')||{}).checked;
+    if(!nick || nick.length < 4){ showToast('Ник минимум 4'); return; }
+    if(!email || email.indexOf('@') < 0){ showToast('Некорректный email'); return; }
+    if(p1.length < 8){ showToast('Пароль минимум 8'); return; }
+    if(p1 !== p2){ showToast('Пароли не совпадают'); return; }
+    if(!ag){ showToast('Подтвердите согласие'); return; }
+    var users = getUsers();
+    if(users[nick]){ showToast('Ник занят'); return; }
+    users[nick] = { email: email, pass: p1, zubucks: 0 };
+    saveUsers(users);
+    fbSaveUser(nick, { email: email, zubucks: 0, created: Date.now() });
+    setCurrentUser(nick);
+    closeLogin();
+    showToast('Аккаунт создан!');
+  }
+/* ============ CHAT ============ */
+var chatHistory = [];
+function esc(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function nowTime(){
+  var d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+function updateChatAccess(){
+  var cur = getCurrentUser();
+  var locked = document.getElementById('chat-locked');
+  var logged = document.getElementById('chat-logged');
+  var bar = document.getElementById('chat-input-bar');
+  if(!locked || !logged || !bar) return;
+  if(cur){
+    locked.style.display = 'none';
+    logged.style.display = 'block';
+    bar.style.display = 'flex';
+    renderChat();
+  } else {
+    locked.style.display = 'block';
+    logged.style.display = 'none';
+    bar.style.display = 'none';
+  }
+}
+function renderChat(){
+  var box = document.getElementById('chat-messages');
+  if(!box) return;
+  if(chatHistory.length === 0){
+    box.innerHTML = '<div style="text-align:center;color:#666;font-size:13px;padding:40px 20px">Чат пуст<br><br><span style="color:#4caf50">/help ваш вопрос</span></div>';
+    return;
+  }
+  box.innerHTML = '';
+  chatHistory.forEach(function(m){
+    var div = document.createElement('div');
+    var cur = getCurrentUser();
+    var isMe = m.author === cur && !m.isHelp;
+    div.style.cssText = 'max-width:82%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.4;word-wrap:break-word;' +
+      (isMe ? 'align-self:flex-end;background:#1e3a5f;border:1px solid #2a4d7a;' :
+              m.isHelp ? 'align-self:flex-start;background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.5);' :
+              'align-self:flex-start;background:#161616;border:1px solid #222;');
+    var authorColor = isMe ? '#8ec5ff' : m.isHelp ? '#4caf50' : '#2196f3';
+    var textColor = m.isHelp ? '#7bd88a' : '#fff';
+    div.innerHTML =
+      '<div style="font-size:11px;font-weight:800;color:' + authorColor + ';margin-bottom:4px">' +
+        (m.isHelp ? '🤖 Помощник' : esc(m.author)) +
+      '</div><div style="color:' + textColor + '">' + esc(m.text) + '</div>' +
+      '<div style="font-size:10px;color:#666;margin-top:5px;text-align:right">' + m.time + '</div>';
+    box.appendChild(div);
+  });
+  box.scrollTop = box.scrollHeight;
+}
+function sendChat(){
+  var cur = getCurrentUser();
+  if(!cur){ showToast('Войдите'); return; }
+  var inp = document.getElementById('chat-input');
+  if(!inp) return;
+  var t = inp.value.trim();
+  if(!t) return;
+  var time = nowTime();
+  chatHistory.push({ author:cur, text:t, time:time });
+  if(t.toLowerCase().indexOf('/help') === 0){
+    chatHistory.push({ author:'Помощник', isHelp:true, text:'📨 Вопрос отправлен администрации', time:time });
+  }
+  inp.value = '';
+  renderChat();
+}
+
+/* ============ ZUBUCKS ============ */
+var ZB_PACKS = [
+  { amount:40, price:5 }, { amount:50, price:15 },
+  { amount:100, price:30 }, { amount:150, price:40 },
+  { amount:200, price:55 }, { amount:500, price:80 },
+  { amount:1000, price:100 }, { amount:1500, price:125 },
+  { amount:5000, price:150, best:true }
+];
+var pendingPackIdx = null;
+
+function getZubucks(){
+  var cur = getCurrentUser();
+  if(!cur) return 0;
+  var users = getUsers();
+  return (users[cur] && users[cur].zubucks) || 0;
+}
+
+function renderZubucks(){
+  var grid = document.getElementById('zbPackGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  ZB_PACKS.forEach(function(pack, idx){
+    var card = document.createElement('div');
+    card.className = 'zb-pack' + (pack.best ? ' best' : '');
+    card.innerHTML =
+      '<div class="zb-ico">💚</div>' +
+      '<div class="zb-amount">' + pack.amount.toLocaleString('ru-RU') + '<small>ZB</small></div>' +
+      '<div class="zb-price">' + pack.price + ' ₽</div>' +
+      '<button class="zb-buy" type="button">Купить</button>';
+    card.querySelector('.zb-buy').addEventListener('click', function(e){
+      e.stopPropagation();
+      openCheckout(idx);
+    });
+    grid.appendChild(card);
+  });
+  var el = document.getElementById('zbBalance');
+  if(el) el.textContent = getZubucks().toLocaleString('ru-RU');
+}
+
+function openCheckout(idx){
+  var cur = getCurrentUser();
+  if(!cur){ showToast('Войдите в аккаунт'); openLogin(); return; }
+  pendingPackIdx = idx;
+  var pack = ZB_PACKS[idx];
+  var title = document.getElementById('checkoutTitle');
+  var desc = document.getElementById('checkoutDesc');
+  var price = document.getElementById('checkoutPrice');
+  if(title) title.textContent = pack.amount.toLocaleString('ru-RU') + ' Zubucks';
+  if(desc) desc.textContent = 'Игровая валюта XYBLOX SHOP. Сумма к оплате: ' + pack.price + ' ₽';
+  if(price) price.textContent = pack.amount.toLocaleString('ru-RU') + ' Zubucks — ' + pack.price + ' ₽';
+  var m = document.getElementById('checkoutModal');
+  if(m) m.classList.add('show');
+}
+function closeCheckout(){
+  var m = document.getElementById('checkoutModal');
+  if(m) m.classList.remove('show');
+}
+function closePayOff(){
+  var m = document.getElementById('payOffModal');
+  if(m) m.classList.remove('show');
+}
+
+/* ============ ПОКУПКА ============ */
+function completePurchase(){
+  var cur = getCurrentUser();
+  if(!cur){ showToast('Войдите'); return; }
+  if(pendingPackIdx === null){ showToast('Товар не выбран'); return; }
+  var pack = ZB_PACKS[pendingPackIdx];
+
+  var payBtn = document.getElementById('checkoutPay');
+  if(payBtn){ payBtn.disabled = true; payBtn.textContent = 'Обработка...'; }
+
+  setTimeout(function(){
+    var users = getUsers();
+    if(!users[cur]) users[cur] = {};
+    var currentBalance = users[cur].zubucks || 0;
+    var newBalance = currentBalance + pack.amount;
+    users[cur].zubucks = newBalance;
+    saveUsers(users);
+
+    fbSaveBalance(cur, newBalance).then(function(ok){
+      console.log(ok ? '✅ Firebase обновлён' : '⚠️ Firebase не обновился');
+    });
+
+    var el = document.getElementById('zbBalance');
+    if(el) el.textContent = newBalance.toLocaleString('ru-RU');
+
+    if(payBtn){
+      payBtn.disabled = false;
+      payBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Перейти к оплате';
+    }
+
+    closeCheckout();
+    var pt = document.getElementById('payOffText');
+    if(pt) pt.textContent = 'Зачислено ' + pack.amount.toLocaleString('ru-RU') + ' Zubucks. Новый баланс: ' + newBalance.toLocaleString('ru-RU');
+    var pm = document.getElementById('payOffModal');
+    if(pm) pm.classList.add('show');
+
+    pendingPackIdx = null;
+    renderZubucks();
+  }, 700);
+}
+  /* ============ HANDLE TAP ============ */
+  function handleTap(e){
+    var t = e.target;
+    if(!t || !t.closest) return;
+
+    var tab = t.closest('.tab');
+    if(tab){ e.preventDefault(); var n = tab.getAttribute('data-tab'); if(n) switchTab(n); return; }
+
+    var chip = t.closest('.chip');
+    if(chip){
+      var par = chip.parentElement;
+      if(par){ par.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); }); }
+      chip.classList.add('active');
+      return;
+    }
+
+    if(t.closest('#loginBtn')){ e.preventDefault(); openLogin(); return; }
+    if(t.closest('#modalCloseBtn')){ e.preventDefault(); closeLogin(); return; }
+    if(t.id === 'tabLogin'){ e.preventDefault(); switchAuthTab('login'); return; }
+    if(t.id === 'tabRegister'){ e.preventDefault(); switchAuthTab('register'); return; }
+
+    var label = t.closest('label');
+    if(label && label.querySelector('#regAgreeBox')){ e.preventDefault(); toggleRegAgree(); return; }
+    if(t.closest('#regAgreeBox')){ e.preventDefault(); toggleRegAgree(); return; }
+
+    if(t.closest('#loginSubmit')){ e.preventDefault(); submitLogin(); return; }
+    if(t.closest('#regSubmit')){ e.preventDefault(); submitRegister(); return; }
+
+    if(t.closest('#chat-login-btn')){ e.preventDefault(); openLogin(); return; }
+    if(t.closest('#chat-send')){ e.preventDefault(); sendChat(); return; }
+
+    if(t.closest('#checkoutClose') || t.closest('#checkoutCancel')){ e.preventDefault(); closeCheckout(); return; }
+    if(t.closest('#checkoutPay')){ e.preventDefault(); completePurchase(); return; }
+    if(t.closest('#payOffClose') || t.closest('#payOffCloseBtn')){ e.preventDefault(); closePayOff(); return; }
+
+    var method = t.closest('.checkout-method');
+    if(method){
+      e.preventDefault();
+      document.querySelectorAll('.checkout-method').forEach(function(m){ m.classList.remove('selected'); });
+      method.classList.add('selected');
+      return;
+    }
+
+    if(t.closest('.social-btn')){ e.preventDefault(); showToast('Скоро'); return; }
+    if(t.closest('#terms-back')){ e.preventDefault(); switchTab('home'); return; }
+
+    var a = t.closest('.footer-links a');
+    if(a){
+      e.preventDefault();
+      var l = a.getAttribute('data-link');
+      if(l === 'terms'){ openTerms(); return; }
+      if(l === 'privacy'){ showToast('Политика конфиденциальности'); return; }
+      if(l === 'status'){ showToast('Статус'); return; }
+      return;
+    }
+
+    var qi = t.closest('.quick-item');
+    if(qi){
+      e.preventDefault();
+      if(qi.getAttribute('data-action') === 'frames') switchTab('frames');
+      else showToast('В разработке');
+      return;
+    }
+
+    var dot = t.closest('.banner-dots .dot');
+    if(dot){
+      e.preventDefault();
+      var p = dot.parentElement;
+      p.querySelectorAll('.dot').forEach(function(d){ d.classList.remove('active'); });
+      dot.classList.add('active');
+      return;
+    }
+  }
+
+  document.addEventListener('click', handleTap, true);
+  document.addEventListener('touchend', function(e){
+    var tag = (e.target.tagName || '').toLowerCase();
+    if(tag === 'input' || tag === 'textarea') return;
+    setTimeout(function(){ handleTap(e); }, 0);
+  }, {passive:false});
+
+  document.addEventListener('keydown', function(e){
+    if(e.target.id === 'chat-input' && e.key === 'Enter'){ e.preventDefault(); sendChat(); }
+  });
+
+  /* ============ INIT ============ */
+  function init(){
+    updateTopbarUser();
+    updateChatAccess();
+    renderZubucks();
+    switchTab('home');
+    var cur = getCurrentUser();
+    if(cur) listenBalanceForUser(cur);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
